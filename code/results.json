@@ -1,0 +1,980 @@
+{
+  "experiment_a": [
+    {
+      "n": 1,
+      "p_step": 0.97,
+      "success_baseline": 0.97065,
+      "cost_baseline": 1.0,
+      "success_checkpoint": 0.9915,
+      "cost_checkpoint": 1.0882
+    },
+    {
+      "n": 2,
+      "p_step": 0.97,
+      "success_baseline": 0.93925,
+      "cost_baseline": 2.0,
+      "success_checkpoint": 0.98115,
+      "cost_checkpoint": 2.21745
+    },
+    {
+      "n": 5,
+      "p_step": 0.97,
+      "success_baseline": 0.8566,
+      "cost_baseline": 5.0,
+      "success_checkpoint": 0.9507,
+      "cost_checkpoint": 5.87605
+    },
+    {
+      "n": 10,
+      "p_step": 0.97,
+      "success_baseline": 0.73515,
+      "cost_baseline": 10.0,
+      "success_checkpoint": 0.90085,
+      "cost_checkpoint": 12.87395
+    },
+    {
+      "n": 20,
+      "p_step": 0.97,
+      "success_baseline": 0.5472,
+      "cost_baseline": 20.0,
+      "success_checkpoint": 0.8133,
+      "cost_checkpoint": 24.5651
+    },
+    {
+      "n": 30,
+      "p_step": 0.97,
+      "success_baseline": 0.4058,
+      "cost_baseline": 30.0,
+      "success_checkpoint": 0.7259,
+      "cost_checkpoint": 34.84365
+    },
+    {
+      "n": 50,
+      "p_step": 0.97,
+      "success_baseline": 0.2186,
+      "cost_baseline": 50.0,
+      "success_checkpoint": 0.5836,
+      "cost_checkpoint": 52.1346
+    },
+    {
+      "n": 75,
+      "p_step": 0.97,
+      "success_baseline": 0.10555,
+      "cost_baseline": 75.0,
+      "success_checkpoint": 0.44675,
+      "cost_checkpoint": 69.5767
+    },
+    {
+      "n": 100,
+      "p_step": 0.97,
+      "success_baseline": 0.04805,
+      "cost_baseline": 100.0,
+      "success_checkpoint": 0.3345,
+      "cost_checkpoint": 82.77145
+    },
+    {
+      "n": 150,
+      "p_step": 0.97,
+      "success_baseline": 0.01075,
+      "cost_baseline": 150.0,
+      "success_checkpoint": 0.19725,
+      "cost_checkpoint": 100.1739
+    },
+    {
+      "n": 200,
+      "p_step": 0.97,
+      "success_baseline": 0.00215,
+      "cost_baseline": 200.0,
+      "success_checkpoint": 0.11525,
+      "cost_checkpoint": 111.0164
+    },
+    {
+      "n": 300,
+      "p_step": 0.97,
+      "success_baseline": 0.0,
+      "cost_baseline": 300.0,
+      "success_checkpoint": 0.03925,
+      "cost_checkpoint": 120.29105
+    }
+  ],
+  "experiment_b_horizon50": [
+    {
+      "p_step": 0.999,
+      "horizon_50pct": 693
+    },
+    {
+      "p_step": 0.99,
+      "horizon_50pct": 69
+    },
+    {
+      "p_step": 0.98,
+      "horizon_50pct": 35
+    },
+    {
+      "p_step": 0.97,
+      "horizon_50pct": 23
+    },
+    {
+      "p_step": 0.95,
+      "horizon_50pct": 14
+    },
+    {
+      "p_step": 0.9,
+      "horizon_50pct": 7
+    }
+  ],
+  "experiment_b_crosscheck": {
+    "p_step": 0.97,
+    "n": 23,
+    "analytic": 0.49630641434198286,
+    "simulated": 0.4938,
+    "abs_diff": 0.0025064143419828433
+  },
+  "experiment_c": [
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 1,
+      "coord_fail_prob": 0.0,
+      "success": 0.2942,
+      "cost": 60.0
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 2,
+      "coord_fail_prob": 0.0,
+      "success": 0.3014,
+      "cost": 46.2885
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 3,
+      "coord_fail_prob": 0.0,
+      "success": 0.29155,
+      "cost": 42.188
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 4,
+      "coord_fail_prob": 0.0,
+      "success": 0.2951,
+      "cost": 40.3005
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 5,
+      "coord_fail_prob": 0.0,
+      "success": 0.3056,
+      "cost": 39.3588
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 6,
+      "coord_fail_prob": 0.0,
+      "success": 0.2974,
+      "cost": 38.513
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 8,
+      "coord_fail_prob": 0.0,
+      "success": 0.2996,
+      "cost": 37.64785
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 1,
+      "coord_fail_prob": 0.02,
+      "success": 0.30145,
+      "cost": 60.0
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 2,
+      "coord_fail_prob": 0.02,
+      "success": 0.2907,
+      "cost": 46.1145
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 3,
+      "coord_fail_prob": 0.02,
+      "success": 0.2838,
+      "cost": 41.569
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 4,
+      "coord_fail_prob": 0.02,
+      "success": 0.28195,
+      "cost": 39.453
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 5,
+      "coord_fail_prob": 0.02,
+      "success": 0.279,
+      "cost": 38.1228
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 6,
+      "coord_fail_prob": 0.02,
+      "success": 0.2689,
+      "cost": 36.895
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 8,
+      "coord_fail_prob": 0.02,
+      "success": 0.2585,
+      "cost": 35.58795
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 1,
+      "coord_fail_prob": 0.05,
+      "success": 0.29915,
+      "cost": 60.0
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 2,
+      "coord_fail_prob": 0.05,
+      "success": 0.27835,
+      "cost": 45.279
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 3,
+      "coord_fail_prob": 0.05,
+      "success": 0.2712,
+      "cost": 40.895
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 4,
+      "coord_fail_prob": 0.05,
+      "success": 0.25655,
+      "cost": 38.214
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 5,
+      "coord_fail_prob": 0.05,
+      "success": 0.24025,
+      "cost": 36.2826
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 6,
+      "coord_fail_prob": 0.05,
+      "success": 0.2295,
+      "cost": 34.8335
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 8,
+      "coord_fail_prob": 0.05,
+      "success": 0.20475,
+      "cost": 32.91095
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 1,
+      "coord_fail_prob": 0.1,
+      "success": 0.29595,
+      "cost": 60.0
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 2,
+      "coord_fail_prob": 0.1,
+      "success": 0.2691,
+      "cost": 44.655
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 3,
+      "coord_fail_prob": 0.1,
+      "success": 0.2363,
+      "cost": 39.039
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 4,
+      "coord_fail_prob": 0.1,
+      "success": 0.2197,
+      "cost": 36.05925
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 5,
+      "coord_fail_prob": 0.1,
+      "success": 0.1985,
+      "cost": 33.7344
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 6,
+      "coord_fail_prob": 0.1,
+      "success": 0.17745,
+      "cost": 31.777
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 8,
+      "coord_fail_prob": 0.1,
+      "success": 0.14475,
+      "cost": 29.19345
+    }
+  ],
+  "experiment_d": [
+    {
+      "strategy": "baseline",
+      "checkpoint_interval": null,
+      "detect_prob": null,
+      "success": 0.0108,
+      "cost": 150.0
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 5,
+      "detect_prob": 0.3,
+      "success": 0.03545,
+      "cost": 49.5528
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 5,
+      "detect_prob": 0.5,
+      "success": 0.09335,
+      "cost": 66.93915
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 5,
+      "detect_prob": 0.7,
+      "success": 0.2308,
+      "cost": 95.04575
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 5,
+      "detect_prob": 0.9,
+      "success": 0.5776,
+      "cost": 143.2598
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 10,
+      "detect_prob": 0.3,
+      "success": 0.03505,
+      "cost": 53.6732
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 10,
+      "detect_prob": 0.5,
+      "success": 0.0826,
+      "cost": 72.15915
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 10,
+      "detect_prob": 0.7,
+      "success": 0.20485,
+      "cost": 101.181
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 10,
+      "detect_prob": 0.9,
+      "success": 0.488,
+      "cost": 151.9677
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 20,
+      "detect_prob": 0.3,
+      "success": 0.03145,
+      "cost": 61.30255
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 20,
+      "detect_prob": 0.5,
+      "success": 0.06605,
+      "cost": 81.1352
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 20,
+      "detect_prob": 0.7,
+      "success": 0.14765,
+      "cost": 110.8746
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 20,
+      "detect_prob": 0.9,
+      "success": 0.32965,
+      "cost": 161.25255
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 30,
+      "detect_prob": 0.3,
+      "success": 0.0278,
+      "cost": 70.5789
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 30,
+      "detect_prob": 0.5,
+      "success": 0.05125,
+      "cost": 91.04535
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 30,
+      "detect_prob": 0.7,
+      "success": 0.10905,
+      "cost": 124.7301
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 30,
+      "detect_prob": 0.9,
+      "success": 0.21355,
+      "cost": 171.0837
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 50,
+      "detect_prob": 0.3,
+      "success": 0.0237,
+      "cost": 89.7369
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 50,
+      "detect_prob": 0.5,
+      "success": 0.03985,
+      "cost": 115.2056
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 50,
+      "detect_prob": 0.7,
+      "success": 0.0645,
+      "cost": 148.0825
+    },
+    {
+      "strategy": "checkpoint_rollback",
+      "checkpoint_interval": 50,
+      "detect_prob": 0.9,
+      "success": 0.1118,
+      "cost": 195.8407
+    }
+  ],
+  "experiment_a_replicated": [
+    {
+      "n": 1,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.9698,
+      "success_baseline_std": 0.0016613247725836059,
+      "success_checkpoint_mean": 0.9907600000000001,
+      "success_checkpoint_std": 0.0012361229712289797,
+      "success_baseline_ci95": 0.0014562153686869179,
+      "success_checkpoint_ci95": 0.00108350955694907
+    },
+    {
+      "n": 2,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.9405999999999999,
+      "success_baseline_std": 0.004433959855479064,
+      "success_checkpoint_mean": 0.9814800000000001,
+      "success_checkpoint_std": 0.0011189280584559668,
+      "success_baseline_ci95": 0.003886537173371681,
+      "success_checkpoint_ci95": 0.0009807836866506448
+    },
+    {
+      "n": 5,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.859,
+      "success_baseline_std": 0.004835286961494649,
+      "success_checkpoint_mean": 0.95136,
+      "success_checkpoint_std": 0.003256992477731559,
+      "success_baseline_ci95": 0.004238315891955213,
+      "success_checkpoint_ci95": 0.0028548797803059885
+    },
+    {
+      "n": 10,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.73444,
+      "success_baseline_std": 0.00794908799800328,
+      "success_checkpoint_mean": 0.8953200000000001,
+      "success_checkpoint_std": 0.0050111874840201255,
+      "success_baseline_ci95": 0.006967682840083913,
+      "success_checkpoint_ci95": 0.0043924994980079355
+    },
+    {
+      "n": 20,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.54268,
+      "success_baseline_std": 0.005756040305626802,
+      "success_checkpoint_mean": 0.80508,
+      "success_checkpoint_std": 0.006306504578607723,
+      "success_baseline_ci95": 0.005045391782607196,
+      "success_checkpoint_ci95": 0.005527894991766769
+    },
+    {
+      "n": 30,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.402,
+      "success_baseline_std": 0.0052725705305856265,
+      "success_checkpoint_mean": 0.7215999999999999,
+      "success_checkpoint_std": 0.0074766302570075166,
+      "success_baseline_ci95": 0.004621611840040225,
+      "success_checkpoint_ci95": 0.006553555370941808
+    },
+    {
+      "n": 50,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.21572,
+      "success_baseline_std": 0.004721440458165288,
+      "success_checkpoint_mean": 0.5807599999999999,
+      "success_checkpoint_std": 0.008162597625756158,
+      "success_baseline_ci95": 0.004138525031940732,
+      "success_checkpoint_ci95": 0.007154832280354308
+    },
+    {
+      "n": 75,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.10195999999999998,
+      "success_baseline_std": 0.00428345654816294,
+      "success_checkpoint_mean": 0.44532000000000005,
+      "success_checkpoint_std": 0.004112420211991949,
+      "success_baseline_ci95": 0.003754615207980703,
+      "success_checkpoint_ci95": 0.0036046952492547724
+    },
+    {
+      "n": 100,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.047599999999999996,
+      "success_baseline_std": 0.003867815921162745,
+      "success_checkpoint_mean": 0.34224,
+      "success_checkpoint_std": 0.008402856657113694,
+      "success_baseline_ci95": 0.003390290135076939,
+      "success_checkpoint_ci95": 0.007365428606673201
+    },
+    {
+      "n": 150,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.009680000000000001,
+      "success_baseline_std": 0.0017239489551607965,
+      "success_checkpoint_mean": 0.19563999999999998,
+      "success_checkpoint_std": 0.007518510490782065,
+      "success_baseline_ci95": 0.0015111078849638767,
+      "success_checkpoint_ci95": 0.006590265014398129
+    },
+    {
+      "n": 200,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.00228,
+      "success_baseline_std": 0.0004604345773288535,
+      "success_checkpoint_mean": 0.11468,
+      "success_checkpoint_std": 0.005583189052862172,
+      "success_baseline_ci95": 0.0004035887015266904,
+      "success_checkpoint_ci95": 0.004893880979345532
+    },
+    {
+      "n": 300,
+      "p_step": 0.97,
+      "success_baseline_mean": 0.00012000000000000002,
+      "success_baseline_std": 0.00010954451150103323,
+      "success_checkpoint_mean": 0.039040000000000005,
+      "success_checkpoint_std": 0.003332866633995425,
+      "success_baseline_ci95": 9.601999791710057e-05,
+      "success_checkpoint_ci95": 0.002921386410593435
+    }
+  ],
+  "experiment_c_replicated": [
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 1,
+      "coord_fail_prob": 0.0,
+      "success_mean": 0.2944,
+      "success_std": 0.0060216276869298315,
+      "success_ci95": 0.00527818938652261
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 2,
+      "coord_fail_prob": 0.0,
+      "success_mean": 0.29452,
+      "success_std": 0.005401110996822791,
+      "success_ci95": 0.004734282526423625
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 3,
+      "coord_fail_prob": 0.0,
+      "success_mean": 0.29568,
+      "success_std": 0.0077531928906741324,
+      "success_ci95": 0.006795973207716458
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 4,
+      "coord_fail_prob": 0.0,
+      "success_mean": 0.29468,
+      "success_std": 0.007408913550582174,
+      "success_ci95": 0.006494199060700258
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 5,
+      "coord_fail_prob": 0.0,
+      "success_mean": 0.29592000000000007,
+      "success_std": 0.005790682170521873,
+      "success_ci95": 0.0050757567159981105
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 6,
+      "coord_fail_prob": 0.0,
+      "success_mean": 0.29432,
+      "success_std": 0.007441236456396202,
+      "success_ci95": 0.006522531336835409
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 8,
+      "coord_fail_prob": 0.0,
+      "success_mean": 0.29704,
+      "success_std": 0.006403748902010456,
+      "success_ci95": 0.005613133399448127
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 1,
+      "coord_fail_prob": 0.05,
+      "success_mean": 0.2944,
+      "success_std": 0.0060216276869298315,
+      "success_ci95": 0.00527818938652261
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 2,
+      "coord_fail_prob": 0.05,
+      "success_mean": 0.28084000000000003,
+      "success_std": 0.006669932533391917,
+      "success_ci95": 0.005846453639600672
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 3,
+      "coord_fail_prob": 0.05,
+      "success_mean": 0.2650799999999999,
+      "success_std": 0.006389992175269081,
+      "success_ci95": 0.005601075096800619
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 4,
+      "coord_fail_prob": 0.05,
+      "success_mean": 0.25448,
+      "success_std": 0.009313001664340015,
+      "success_ci95": 0.008163205880044917
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 5,
+      "coord_fail_prob": 0.05,
+      "success_mean": 0.23679999999999998,
+      "success_std": 0.004971921157862424,
+      "success_ci95": 0.004358081045597938
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 6,
+      "coord_fail_prob": 0.05,
+      "success_mean": 0.22891999999999996,
+      "success_std": 0.006325503932494238,
+      "success_ci95": 0.005544548659719747
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 8,
+      "coord_fail_prob": 0.05,
+      "success_mean": 0.20624000000000003,
+      "success_std": 0.0038272705679112885,
+      "success_ci95": 0.0033547505659884754
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 1,
+      "coord_fail_prob": 0.1,
+      "success_mean": 0.2944,
+      "success_std": 0.0060216276869298315,
+      "success_ci95": 0.00527818938652261
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 2,
+      "coord_fail_prob": 0.1,
+      "success_mean": 0.26632,
+      "success_std": 0.006052437525493336,
+      "success_ci95": 0.005305195400736896
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 3,
+      "coord_fail_prob": 0.1,
+      "success_mean": 0.23996,
+      "success_std": 0.005879455757125826,
+      "success_ci95": 0.005153570195505249
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 4,
+      "coord_fail_prob": 0.1,
+      "success_mean": 0.21616,
+      "success_std": 0.006395936209813223,
+      "success_ci95": 0.0056062852727987314
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 5,
+      "coord_fail_prob": 0.1,
+      "success_mean": 0.19256,
+      "success_std": 0.0028333725487482316,
+      "success_ci95": 0.00248356054083649
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 6,
+      "coord_fail_prob": 0.1,
+      "success_mean": 0.17456,
+      "success_std": 0.002430637776387092,
+      "success_ci95": 0.0021305479482987446
+    },
+    {
+      "n_steps": 60,
+      "p_step": 0.98,
+      "m_agents": 8,
+      "coord_fail_prob": 0.1,
+      "success_mean": 0.14244,
+      "success_std": 0.006008993260106051,
+      "success_ci95": 0.0052671148231266
+    }
+  ],
+  "experiment_e": [
+    {
+      "m_agents": 1,
+      "coord_fail_prob": 0.05,
+      "success_no_recovery": 0.29405,
+      "cost_no_recovery": 60.0,
+      "success_with_recovery": 0.66865,
+      "cost_with_recovery": 60.6675
+    },
+    {
+      "m_agents": 2,
+      "coord_fail_prob": 0.05,
+      "success_no_recovery": 0.2837,
+      "cost_no_recovery": 45.5775,
+      "success_with_recovery": 0.6351,
+      "cost_with_recovery": 59.3708
+    },
+    {
+      "m_agents": 3,
+      "coord_fail_prob": 0.05,
+      "success_no_recovery": 0.269,
+      "cost_no_recovery": 40.919,
+      "success_with_recovery": 0.60235,
+      "cost_with_recovery": 57.9736
+    },
+    {
+      "m_agents": 4,
+      "coord_fail_prob": 0.05,
+      "success_no_recovery": 0.2505,
+      "cost_no_recovery": 37.974,
+      "success_with_recovery": 0.5811,
+      "cost_with_recovery": 55.56185
+    },
+    {
+      "m_agents": 5,
+      "coord_fail_prob": 0.05,
+      "success_no_recovery": 0.24475,
+      "cost_no_recovery": 36.2706,
+      "success_with_recovery": 0.5416,
+      "cost_with_recovery": 53.8999
+    },
+    {
+      "m_agents": 6,
+      "coord_fail_prob": 0.05,
+      "success_no_recovery": 0.23625,
+      "cost_no_recovery": 35.087,
+      "success_with_recovery": 0.52505,
+      "cost_with_recovery": 54.38635
+    },
+    {
+      "m_agents": 8,
+      "coord_fail_prob": 0.05,
+      "success_no_recovery": 0.2095,
+      "cost_no_recovery": 32.9415,
+      "success_with_recovery": 0.47705,
+      "cost_with_recovery": 50.5382
+    }
+  ],
+  "experiment_f": [
+    {
+      "q": 0.02,
+      "detect_prob": 0.5,
+      "success_m1_no_recovery": 0.3025333333333333,
+      "success_m8_no_recovery": 0.256,
+      "success_m1_with_recovery": 0.5249333333333334,
+      "success_m8_with_recovery": 0.46086666666666665,
+      "relative_penalty_no_recovery": 0.1538122520934332,
+      "relative_penalty_with_recovery": 0.12204724409448828,
+      "penalty_difference": 0.03176500799894491
+    },
+    {
+      "q": 0.02,
+      "detect_prob": 0.7,
+      "success_m1_no_recovery": 0.30666666666666664,
+      "success_m8_no_recovery": 0.2584666666666667,
+      "success_m1_with_recovery": 0.6705333333333333,
+      "success_m8_with_recovery": 0.5838,
+      "relative_penalty_no_recovery": 0.15717391304347816,
+      "relative_penalty_with_recovery": 0.12934977132630743,
+      "penalty_difference": 0.027824141717170736
+    },
+    {
+      "q": 0.02,
+      "detect_prob": 0.9,
+      "success_m1_no_recovery": 0.29386666666666666,
+      "success_m8_no_recovery": 0.2624666666666667,
+      "success_m1_with_recovery": 0.8546666666666667,
+      "success_m8_with_recovery": 0.7588666666666667,
+      "relative_penalty_no_recovery": 0.10685117967332118,
+      "relative_penalty_with_recovery": 0.11209048361934476,
+      "penalty_difference": -0.00523930394602358
+    },
+    {
+      "q": 0.05,
+      "detect_prob": 0.5,
+      "success_m1_no_recovery": 0.2956666666666667,
+      "success_m8_no_recovery": 0.2052,
+      "success_m1_with_recovery": 0.5242666666666667,
+      "success_m8_with_recovery": 0.3784,
+      "relative_penalty_no_recovery": 0.3059751972942504,
+      "relative_penalty_with_recovery": 0.2782299084435401,
+      "penalty_difference": 0.02774528885071026
+    },
+    {
+      "q": 0.05,
+      "detect_prob": 0.7,
+      "success_m1_no_recovery": 0.30246666666666666,
+      "success_m8_no_recovery": 0.2074,
+      "success_m1_with_recovery": 0.6675333333333333,
+      "success_m8_with_recovery": 0.47426666666666667,
+      "relative_penalty_no_recovery": 0.31430460656821685,
+      "relative_penalty_with_recovery": 0.2895236192949166,
+      "penalty_difference": 0.024780987273300248
+    },
+    {
+      "q": 0.05,
+      "detect_prob": 0.9,
+      "success_m1_no_recovery": 0.29506666666666664,
+      "success_m8_no_recovery": 0.20473333333333332,
+      "success_m1_with_recovery": 0.8523333333333334,
+      "success_m8_with_recovery": 0.606,
+      "relative_penalty_no_recovery": 0.30614550384093986,
+      "relative_penalty_with_recovery": 0.2890105592491201,
+      "penalty_difference": 0.017134944591819745
+    },
+    {
+      "q": 0.1,
+      "detect_prob": 0.5,
+      "success_m1_no_recovery": 0.2915333333333333,
+      "success_m8_no_recovery": 0.1412,
+      "success_m1_with_recovery": 0.531,
+      "success_m8_with_recovery": 0.26093333333333335,
+      "relative_penalty_no_recovery": 0.515664303681683,
+      "relative_penalty_with_recovery": 0.5086001255492781,
+      "penalty_difference": 0.007064178132404897
+    },
+    {
+      "q": 0.1,
+      "detect_prob": 0.7,
+      "success_m1_no_recovery": 0.29933333333333334,
+      "success_m8_no_recovery": 0.14433333333333334,
+      "success_m1_with_recovery": 0.6731333333333334,
+      "success_m8_with_recovery": 0.32293333333333335,
+      "relative_penalty_no_recovery": 0.5178173719376392,
+      "relative_penalty_with_recovery": 0.5202535406556403,
+      "penalty_difference": -0.0024361687180011193
+    },
+    {
+      "q": 0.1,
+      "detect_prob": 0.9,
+      "success_m1_no_recovery": 0.30546666666666666,
+      "success_m8_no_recovery": 0.1474,
+      "success_m1_with_recovery": 0.8573333333333333,
+      "success_m8_with_recovery": 0.4116666666666667,
+      "relative_penalty_no_recovery": 0.5174596246180707,
+      "relative_penalty_with_recovery": 0.5198289269051322,
+      "penalty_difference": -0.0023693022870614477
+    }
+  ]
+}

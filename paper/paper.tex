@@ -1,0 +1,259 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{natbib}
+\usepackage{caption}
+\usepackage{authblk}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+
+\title{Compounding Error, Recovery, and Coordination Overhead in Long-Horizon Agentic AI Systems: A Simulation-Based Reliability Analysis}
+\author{Independent Research Report}
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Agentic AI systems -- large language models embedded in loops of planning, tool use, and multi-step execution -- are increasingly deployed for tasks that unfold over dozens or hundreds of sequential steps. Empirical studies report that reliability, not raw capability, is the dominant bottleneck of such systems, but the mechanisms that produce this bottleneck are usually described qualitatively. This paper isolates four structural mechanisms -- per-step compounding error, checkpoint-and-rollback recovery, multi-agent coordination overhead, and their interaction -- in a controlled Monte Carlo simulation framework, and quantifies their effect on task success probability and execution cost independent of any particular model or benchmark. Across six experiments (20,000 trials per configuration by default, with headline results additionally validated by 5-seed replication with 95\% confidence intervals, and a wider parameter grid confirming the central interaction finding), we find that: (1) task success probability decays multiplicatively with horizon length even at high per-step reliability, producing 50\%-reliability horizons ranging from 7 steps at $p=0.90$ to 693 steps at $p=0.999$; (2) checkpoint-and-rollback recovery can more than triple success probability at long horizons (e.g., 0.334 vs.\ 0.048 at $n=100$ steps, detection probability 0.7), and its benefit is driven far more by detection quality than by checkpoint granularity; (3) splitting a fixed-length task across multiple coordinating agents does not change success probability when coordination is perfect, but degrades monotonically as coordination-failure probability increases, with an 8-agent decomposition losing roughly 15 percentage points of absolute success probability relative to a single agent at a 10\% per-handoff coordination-failure rate; and (4) adding within-segment recovery to a multi-agent system substantially raises absolute success probability at every agent count, but leaves the \emph{relative} coordination penalty essentially unchanged -- a pattern we show, in a follow-up experiment spanning a $3\times3$ grid of coordination-failure probabilities and recovery detection qualities, holds robustly throughout. This indicates recovery quality and coordination reliability act as largely separable design levers. We argue these results provide a minimal, falsifiable structural account that is consistent with, and helps explain, several qualitative findings in the empirical agentic-AI literature, and we release all code, in a version-controlled repository, to support replication and calibration against real agent traces.
+\end{abstract}
+
+\noindent\textbf{Keywords:} agentic AI, LLM agents, reliability, error propagation, multi-agent systems, checkpoint recovery, Monte Carlo simulation, reproducibility
+
+\tableofcontents
+
+\section{Introduction}
+Large language model (LLM) agents are no longer evaluated primarily on single-turn question answering; they are increasingly asked to complete extended tasks that require dozens of sequential tool calls, multi-step plans, and, in many production systems, coordination among several specialized sub-agents. Recent measurement studies converge on a consistent qualitative picture: the capability of frontier models to reason about a task has outpaced their reliability in executing a long sequence of dependent actions without an unrecoverable error. \citet{kwa2025measuring} find that the task duration over which frontier agents succeed at a 50\% rate has grown roughly exponentially over recent years, but that near-perfect single-step accuracy still translates into steep success-rate decay as horizon length grows. \citet{cemri2025why} analyze over 1,600 annotated multi-agent execution traces and find failure rates between 41\% and 86\% across seven popular multi-agent frameworks, attributing a plurality of failures to system-design and inter-agent misalignment issues rather than to any single agent's reasoning failure.
+
+These findings are compelling, but they are drawn from heterogeneous production systems with many confounded variables -- model choice, prompt design, tool reliability, orchestration framework, and task distribution all vary simultaneously. It is therefore difficult to isolate how much of the observed reliability degradation is structurally inevitable given compounding per-step error, and how much additional degradation specifically comes from multi-agent coordination as opposed to simply the length of the task. It is similarly difficult, from field data alone, to quantify the cost-reliability tradeoff of a common mitigation -- checkpointing and rolling back to a known-good state after a detected error -- independent of any one framework's implementation details, or to know whether such recovery mechanisms specifically compensate for coordination failure or merely add to overall reliability independently of it.
+
+This paper takes a complementary approach: rather than analyzing further empirical traces, we build a minimal, parameterized Monte Carlo simulation of agent task execution that isolates exactly these mechanisms in their simplest possible form, and asks what each mechanism predicts in isolation and in combination. The goal is not to replace empirical benchmarking but to provide a first-principles reference model against which empirical observations can be interpreted.
+
+\subsection{Contributions}
+We make five contributions. \textbf{(1)} We formalize four execution strategies for long-horizon agent tasks -- no-recovery baseline, checkpoint-and-rollback recovery, fixed-budget multi-agent decomposition, and their combination -- as explicit stochastic models. \textbf{(2)} We implement a Monte Carlo simulator for all strategies and validate it against closed-form probability where available. \textbf{(3)} We report a systematic parameter sweep (Experiments A--D) quantifying success probability and execution cost as functions of horizon length, per-step reliability, checkpoint interval, detection probability, number of agents, and coordination-failure probability, with headline results replicated across 5 independent seeds. \textbf{(4)} We introduce Experiments E and F, which isolate the interaction between recovery and multi-agent coordination and test it across a $3\times3$ parameter grid, finding the two act as separable design levers rather than one compensating for the other. \textbf{(5)} We discuss how these structural results relate to, and help explain, existing empirical findings in the agentic-AI reliability literature, and outline concrete extensions for calibrating the model against real agent traces.
+
+\section{Related Work}
+
+\subsection{Agentic AI systems and architectures}
+The dominant architectural pattern for LLM agents traces to the ReAct framework \citep{yao2022react}, which interleaves reasoning traces with tool-call actions and observations in a loop. Subsequent work added self-reflection (Reflexion; \citealp{shinn2023reflexion}), persistent skill libraries for open-ended tasks (Voyager; \citealp{wang2023voyager}), and multi-agent conversational orchestration (AutoGen; \citealp{wu2023autogen}). Recent surveys catalog dozens of orchestration frameworks and note that architecture choice alone can shift benchmark scores substantially for a fixed underlying model.
+
+\subsection{Reliability and failure taxonomies}
+\citet{cemri2025why} introduce the Multi-Agent System Failure Taxonomy (MAST), classifying failures into system-design, inter-agent misalignment, and task-verification categories from real execution traces across popular frameworks. A related error taxonomy emphasizes that once an error occurs early in an agent trajectory, it tends to propagate forward largely uncorrected, which the authors identify as the primary bottleneck limiting long-horizon success -- a mechanism our checkpoint-and-rollback model is designed to probe directly. \citet{kwa2025measuring} operationalize reliability as the task duration at which an agent's success probability crosses 50\%, and report this horizon has grown at a roughly exponential rate across model generations.
+
+\subsection{Evaluation and benchmarking}
+Existing benchmarks (GAIA, \citealp{mialon2023gaia}; tau-bench and tau2-bench, \citealp{yao2024taubench,barres2025tau2bench}) primarily report single-attempt success rates (pass@1); tau2-bench's pass$^k$ metric, which measures the probability that $k$ independent attempts all succeed, is closer in spirit to the reliability question this paper addresses, and we adopt a similar ``probability of full-trajectory success'' framing. Separately, measurement-methodology critiques argue that current agent evaluation over-indexes on capability and under-indexes on reliability, cost, and safety jointly -- a gap this paper's cost-reliability Pareto analysis (Experiment D) is intended to address in miniature.
+
+\subsection{Recovery, memory, and coordination}
+Practitioner and vendor guidance on long-horizon agents recommends structured checkpointing and note-taking to counteract context degradation over long trajectories, but we are not aware of a controlled quantitative model isolating the reliability-cost tradeoff of checkpoint-and-rollback recovery independent of a specific implementation, or of prior work directly testing whether such recovery mechanisms compensate specifically for multi-agent coordination failure -- the questions addressed by our Experiments D, E, and F.
+
+\section{Problem Formulation}
+We model an agent task as a sequence of $n$ discrete steps (e.g., a tool call, a sub-goal, a reasoning hop), each of which independently succeeds with probability $p$ (``per-step reliability'') and fails otherwise. We study four execution strategies.
+
+\paragraph{Strategy 1 -- No-recovery baseline.} The task succeeds if and only if all $n$ steps succeed. Under the independence assumption, task success probability is exactly $p^n$ -- an explicit, minimal formalization of ``compounding error.''
+
+\paragraph{Strategy 2 -- Checkpoint-and-rollback recovery.} The trajectory is divided into segments of length $c$ (``checkpoint interval''). A verifier inspects the trajectory at each checkpoint and detects a failure within the completed segment with probability $d$ (``detection probability''), modeling the empirically documented fact that failures are often silent and not perfectly caught. On detection, the agent rolls back to the last checkpoint and retries the segment, paying an additional fixed cost $r$ (``rollback cost''), up to a maximum of two retries per segment. Undetected failures propagate forward uncorrected, exactly as in the baseline.
+
+\paragraph{Strategy 3 -- Fixed-budget multi-agent decomposition.} The same $n$-step task is partitioned across $m$ agents, each responsible for a contiguous segment, with no recovery within a segment. Each of the $m-1$ hand-offs between agents introduces an additional, independent coordination-failure event with probability $q$, modeling miscommunication or context loss at agent boundaries, on top of ordinary step-level error.
+
+\paragraph{Strategy 4 -- Multi-agent decomposition with within-segment recovery.} Identical to Strategy 3, except each agent's segment is itself executed as a Strategy-2 sub-task, while coordination-failure events at hand-offs remain unrecoverable. This strategy isolates whether recovery mechanisms can compensate for coordination overhead specifically, or whether the two act independently.
+
+For all strategies we report task success probability and expected cost (mean number of step-executions consumed per trial), estimated by Monte Carlo simulation over $N=20{,}000$ trials per configuration (fixed base seed 20260726 for reproducibility). Strategy 1's success probability has the closed form $p^n$, which we use to validate the simulator (Section~\ref{sec:validation}) before applying it to strategies without closed-form solutions.
+
+\section{Methodology}
+All experiments were implemented in Python (NumPy for vectorized random sampling) and are fully specified by the code released alongside this paper. We designed six experiments to isolate each mechanism of interest and their interaction.
+
+\paragraph{Experiment A -- Compounding error and recovery vs.\ horizon length.} Fixing $p=0.97$, we sweep horizon length $n \in \{1,2,5,10,20,30,50,75,100,150,200,300\}$ and compare the no-recovery baseline against checkpoint-and-rollback recovery ($c=10$, $d=0.7$, $r=3$). We replicate this sweep across 5 seeds for error bars.
+
+\paragraph{Experiment B -- Sensitivity of the reliability horizon to per-step accuracy.} For $p \in \{0.999, 0.99, 0.98, 0.97, 0.95, 0.90\}$, we compute the horizon at which baseline success probability first drops below 0.5, using the closed form $p^n$, cross-validated against simulation at $p=0.97$, $n=23$ (50,000 trials).
+
+\paragraph{Experiment C -- Multi-agent coordination overhead.} Fixing $n=60$, $p=0.98$, we sweep $m \in \{1,2,3,4,5,6,8\}$ and $q \in \{0.0, 0.02, 0.05, 0.10\}$. We replicate $q \in \{0.0, 0.05, 0.10\}$ across 5 seeds for error bars.
+
+\paragraph{Experiment D -- Reliability-cost Pareto frontier.} Fixing $n=150$, $p=0.97$, we sweep checkpoint interval $c \in \{5,10,20,30,50\}$ and detection probability $d \in \{0.3,0.5,0.7,0.9\}$, plotting success probability against expected cost for every configuration against the no-recovery baseline.
+
+\paragraph{Experiment E -- Interaction between recovery and multi-agent coordination.} Fixing $n=60$, $p=0.98$, $q=0.05$, we sweep $m \in \{1,\ldots,8\}$ and compare Strategy 3 against Strategy 4 (recovery interval 10, detection 0.7) at each agent count.
+
+\paragraph{Experiment F -- Grid robustness check of Experiment E.} We sweep $q \in \{0.02, 0.05, 0.10\}$ and $d \in \{0.5, 0.7, 0.9\}$ in a full $3\times3$ grid (15,000 trials per cell, $n=60$, $p=0.98$), and for each cell compute the relative coordination penalty (proportional loss from $m=1$ to $m=8$) with and without within-segment recovery.
+
+\section{Results}
+
+\subsection{Simulator validation}
+\label{sec:validation}
+At $p=0.97$, $n=23$, the closed-form baseline success probability is $p^n = 0.4963$; the Monte Carlo estimate over 50,000 trials was 0.4938, an absolute difference of 0.0025 -- within expected Monte Carlo sampling error (binomial SE $\approx 0.0022$). This confirms the simulator correctly implements the intended stochastic model.
+
+\subsection{Experiment A: compounding error dominates at moderate-to-long horizons}
+At $p=0.97$ per step, baseline success probability falls from 0.971 at $n=1$ to 0.547 at $n=20$, 0.219 at $n=50$, and 0.011 at $n=150$. Checkpoint-and-rollback recovery substantially blunts this decay: success probability at $n=150$ rises from 0.011 to 0.197 (an $\approx$18-fold relative improvement), and at $n=100$ rises from 0.048 to 0.334 ($\approx$7-fold).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{fig1_horizon_success.png}
+\caption{Task success probability vs.\ horizon length, no-recovery baseline vs.\ checkpoint-and-rollback recovery ($p=0.97$/step).}
+\label{fig:1}
+\end{figure}
+
+The cost of recovery is modest and, notably, sub-linear relative to the baseline at long horizons: at $n=300$, the baseline always consumes exactly 300 step-executions, while the recovery strategy's expected cost is only 120.3 -- lower than the baseline -- because most trajectories under recovery still fail before reaching the end, truncating their cost.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{fig2_horizon_cost.png}
+\caption{Expected execution cost (step-executions consumed) vs.\ horizon length for both strategies.}
+\label{fig:2}
+\end{figure}
+
+\subsection{Experiment B: the 50\%-reliability horizon is extremely sensitive to per-step reliability}
+The 50\%-reliability horizon under the no-recovery model is 7 steps at $p=0.90$, 14 at $p=0.95$, 23 at $p=0.97$, 35 at $p=0.98$, 69 at $p=0.99$, and 693 at $p=0.999$ -- consistent with horizon $\approx \ln(0.5)/\ln(p)$. A seemingly small improvement in per-step reliability, from 0.97 to 0.99, roughly triples the horizon over which a task can be completed reliably without any recovery mechanism at all.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\textwidth]{fig3_reliability_sensitivity.png}
+\caption{Sensitivity of the 50\%-reliability horizon to per-step reliability $p$ (p-axis reversed).}
+\label{fig:3}
+\end{figure}
+
+\subsection{Experiment C: coordination failure, not decomposition itself, drives multi-agent degradation}
+With perfect coordination ($q=0$), splitting a fixed 60-step task across 1 to 8 agents leaves success probability essentially unchanged (0.294 at $m=1$ vs.\ 0.300--0.306 across $m=2$--8). As soon as coordination-failure probability is positive, degradation is monotonic and material: at $q=0.05$, success probability falls from 0.299 ($m=1$) to 0.205 ($m=8$); at $q=0.10$, it falls from 0.296 to 0.145 -- a loss of roughly 15 percentage points purely from handoff overhead.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{fig4_multiagent_coordination.png}
+\caption{Task success probability vs.\ number of agents ($m$), fixed total steps $n=60$, for varying per-handoff coordination-failure probability $q$.}
+\label{fig:4}
+\end{figure}
+
+\subsection{Experiment D: recovery strategy tuning exposes a clear reliability-cost frontier}
+At $n=150$, $p=0.97$, the no-recovery baseline achieves success probability 0.011 at cost 150. The frontier is dominated by detection probability $d$ far more than by checkpoint interval $c$: moving $d$ from 0.3 to 0.9 (fixed $c=10$) raises success probability from 0.035 to 0.488 while raising cost from 53.7 to 152.0, whereas at fixed $d=0.7$, moving $c$ from 5 to 50 \emph{lowers} success probability from 0.231 to 0.065 while \emph{raising} cost from 95.0 to 148.1 -- i.e., coarser checkpointing is dominated (worse on both axes) relative to finer checkpointing at the same detection quality.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.72\textwidth]{fig5_pareto_frontier.png}
+\caption{Reliability-cost Pareto frontier for checkpoint-and-rollback recovery ($n=150$, $p=0.97$/step), varying checkpoint interval and detection probability, against the no-recovery baseline.}
+\label{fig:5}
+\end{figure}
+
+\subsection{Statistical robustness: 5-seed replication of headline results}
+To confirm the headline results are not artifacts of a single random seed, we replicated Experiments A and C across 5 independent seeds (5,000 trials each) and report the across-seed mean with an approximate 95\% confidence interval. The replicated curves (Figures~\ref{fig:6}, \ref{fig:7}) closely track the single-seed point estimates, with 95\% CI half-widths at or below roughly 0.007 for every configuration tested -- small relative to the effect sizes reported throughout this section.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\textwidth]{fig1b_horizon_success_errorbars.png}
+\caption{Compounding-error curve from Experiment A, replicated across 5 independent seeds, with $\pm 1$ s.d.\ error bars.}
+\label{fig:6}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\textwidth]{fig4b_multiagent_errorbars.png}
+\caption{Multi-agent coordination-overhead curve from Experiment C, replicated across 5 independent seeds, with $\pm 1$ s.d.\ error bars.}
+\label{fig:7}
+\end{figure}
+
+\subsection{Experiment E: recovery and coordination overhead act as separable factors}
+Adding within-segment checkpoint-and-rollback recovery ($c=10$, $d=0.7$) to the multi-agent setting, at $q=0.05$, raises absolute success probability substantially at every agent count: from 0.294 to 0.669 at $m=1$, from 0.269 to 0.602 at $m=3$, and from 0.209 to 0.477 at $m=8$. However, the relative penalty attributable specifically to coordination overhead is almost unchanged by recovery: without recovery this loss is $(0.294-0.209)/0.294 \approx 28.9\%$; with recovery it is $(0.669-0.477)/0.669 \approx 28.7\%$. Within-segment recovery substantially improves absolute reliability but does not specifically rescue the losses caused by inter-agent coordination failure.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{fig6_recovery_multiagent_interaction.png}
+\caption{Task success probability vs.\ number of agents, with and without within-segment checkpoint-and-rollback recovery, at a fixed 5\% per-handoff coordination-failure probability.}
+\label{fig:8}
+\end{figure}
+
+\subsection{Experiment F: the separability finding generalizes across a wider grid}
+Repeating the $m=1$-vs-$m=8$ comparison across a full $3\times3$ grid of $q \in \{0.02, 0.05, 0.10\}$ and $d \in \{0.5, 0.7, 0.9\}$ (15,000 trials per cell), two patterns emerge cleanly. First, the relative coordination penalty scales consistently with $q$ and is essentially insensitive to $d$: at $q=0.02$ the penalty is 10.7\%--15.7\% across all three detection qualities; at $q=0.05$ it is 27.8\%--31.4\%; at $q=0.10$ it is 50.9\%--52.0\%. Second, the difference between the no-recovery penalty and the with-recovery penalty is small and shows no consistent sign across the grid -- ranging from $-0.5$ to $+3.2$ percentage points, centered near zero. This indicates the multiplicative-independence pattern from Experiment E is not an artifact of one parameter setting, but holds across a substantially wider region of the $(q,d)$ space.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{fig9_experiment_f_grid.png}
+\caption{(a) Relative coordination penalty ($m{=}1$ vs.\ $m{=}8$) as a function of recovery detection probability, for three coordination-failure probabilities $q$, with and without within-segment recovery. (b) The difference between the no-recovery and with-recovery penalty at each grid point, showing no consistent trend.}
+\label{fig:9}
+\end{figure}
+
+\section{Discussion}
+Taken together, these six experiments support a simple structural story: long-horizon agent reliability is primarily a compounding-probability problem, multi-agent decomposition adds a second, independent compounding-probability problem at each coordination boundary, and recovery mechanisms only help to the extent that failures can be detected, not merely retried -- and recovery quality and coordination reliability appear to act as separable design levers across a substantial region of parameter space. This is consistent with, and offers a mechanistic complement to, \citet{kwa2025measuring}'s observation that near-perfect short-task performance coexists with steep long-task degradation, and \citet{cemri2025why}'s finding that a plurality of multi-agent failures stem from system-design and inter-agent misalignment rather than any single agent's reasoning ability.
+
+The separability result has a direct practical implication: teams building multi-agent systems should not expect adding recovery mechanisms within each agent's segment to close the reliability gap caused by poor inter-agent coordination. Coordination failure requires its own dedicated mitigation -- better shared-state protocols, structured hand-off formats, or verification specifically at agent boundaries -- layered on top of, not as a substitute for, within-agent recovery.
+
+More broadly, the marginal return on improving raw model accuracy at the level of individual steps is very high, precisely because of the exponential relationship in Experiment B -- but where further accuracy gains are hard to obtain, investment in reliable failure detection appears in this model to be a more cost-effective lever than either finer-grained checkpointing or naive multi-agent decomposition.
+
+\section{Limitations}
+This is a structural simulation study, not an empirical study of real LLM agent traces.
+
+\begin{enumerate}
+\item \textbf{Independence assumption:} we model per-step failures as i.i.d.\ Bernoulli events; real LLM agent errors are almost certainly correlated across steps.
+\item \textbf{Homogeneous step reliability:} real tasks mix easy and hard steps with heterogeneous failure probabilities; we use a single constant $p$ per experiment.
+\item \textbf{Stylized detection and coordination models:} $d$ and $q$ are free parameters chosen to illustrate the qualitative shape of the tradeoff, not fit to any specific measured system.
+\item \textbf{No model of adversarial or systematic error:} we do not model prompt injection, tool hijacking, or other security failure modes.
+\item \textbf{Cost proxy is simplified:} our ``expected cost'' measures step-executions consumed in a single attempt, which can be \emph{lower} for a worse-performing strategy because failing trajectories are truncated early.
+\item \textbf{Experiments E/F test a bounded region of parameter space:} the grid holds $n$, $p$, and checkpoint interval fixed; we have not verified the separability pattern at very different horizons, step reliabilities, or checkpoint granularities.
+\end{enumerate}
+
+The specific numbers reported here should be read as illustrations of the shape of the underlying relationships, not as predictions for any particular deployed agent system.
+
+\section{Future Work}
+The natural extension of this study is calibration against real agent execution traces: fitting $p$, $d$, and $q$ to observed step-level success rates, verifier catch rates, and multi-agent handoff failure rates from a corpus of logged trajectories, then testing whether the calibrated model's predicted horizon-vs-success curve matches held-out empirical data. A second extension relaxes the independence assumption via a Markov-chain or hidden-state model in which failure probability depends on accumulated trajectory state. A third extension models adaptive, learned checkpoint policies. Fourth, extending the Experiment F grid to $n$, $p$, and checkpoint interval, and deriving an analytic condition under which separability is guaranteed, would convert an empirical regularity into a provable property of the model.
+
+\section{Conclusion}
+We presented a controlled Monte Carlo simulation framework isolating structural mechanisms in long-horizon agentic AI task execution -- compounding per-step error, checkpoint-and-rollback recovery, multi-agent coordination overhead, and their interaction -- and quantified their effect on task success probability and execution cost across six systematic, replicated experiments. Success probability decays multiplicatively and steeply with horizon length even at high per-step reliability; recovery mechanisms are effective in proportion to their detection quality rather than their checkpoint granularity; multi-agent decomposition is reliability-neutral only under perfect coordination; and within-segment recovery substantially improves absolute reliability without specifically closing the coordination-overhead gap, a pattern that holds robustly across a meaningful parameter range. We release the simulation code, in a version-controlled repository, to support replication, extension, and calibration against real agent traces.
+
+\section{Ethics and Broader Impact}
+This work is a theoretical/simulation study and does not involve human subjects, personal data, or deployed systems. We see the primary broader-impact value as helping practitioners reason more precisely about when long-horizon or multi-agent AI deployments are likely to be unreliable, which could reduce over-trust in autonomous agent systems for high-stakes tasks. A possible negative use is over-generalizing our stylized numbers to real deployed systems without recalibration, which we caution against in Section~7.
+
+\section{Data and Code Availability}
+No external data was used; all results are generated by the simulation code released with this paper in the accompanying git repository (\texttt{code/simulation.py}, \texttt{code/make\_figures.py}, \texttt{code/results.json}), with a fixed base random seed of 20260726 for exact reproducibility.
+
+\bibliographystyle{plainnat}
+\begin{thebibliography}{99}
+
+\bibitem[Yao et al.(2022)]{yao2022react} Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K., \& Cao, Y. (2022). ReAct: Synergizing Reasoning and Acting in Language Models. \emph{arXiv:2210.03629}.
+
+\bibitem[Shinn et al.(2023)]{shinn2023reflexion} Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K., \& Yao, S. (2023). Reflexion: Language Agents with Verbal Reinforcement Learning. \emph{arXiv:2303.11366}.
+
+\bibitem[Wang et al.(2023)]{wang2023voyager} Wang, G., Xie, Y., Jiang, Y., Mandlekar, A., Xiao, C., Zhu, Y., Fan, L., \& Anandkumar, A. (2023). Voyager: An Open-Ended Embodied Agent with Large Language Models. \emph{arXiv:2305.16291}.
+
+\bibitem[Wu et al.(2023)]{wu2023autogen} Wu, Q., Bansal, G., Zhang, J., Wu, Y., Li, B., Zhu, E., Jiang, L., Zhang, X., Zhang, S., Liu, J., Awadallah, A.~H., White, R.~W., Burger, D., \& Wang, C. (2023). AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation. \emph{arXiv:2308.08155}.
+
+\bibitem[Cemri et al.(2025)]{cemri2025why} Cemri, M., Pan, M.~Z., Yang, S., et al. (2025). Why Do Multi-Agent LLM Systems Fail? \emph{arXiv:2503.13657}.
+
+\bibitem[Kwa et al.(2025)]{kwa2025measuring} Kwa, T., West, B., Becker, J., et al. (2025). Measuring AI Ability to Complete Long Software Tasks. \emph{arXiv:2503.14499}.
+
+\bibitem[Mialon et al.(2023)]{mialon2023gaia} Mialon, G., Fourrier, C., Swift, C., Wolf, T., LeCun, Y., \& Scialom, T. (2023). GAIA: A Benchmark for General AI Assistants. \emph{arXiv:2311.12983}.
+
+\bibitem[Yao et al.(2024)]{yao2024taubench} Yao, S. et al. (2024). tau-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains. \emph{arXiv:2406.12045}.
+
+\bibitem[Barres et al.(2025)]{barres2025tau2bench} Barres, V. et al. (2025). tau2-bench: Evaluating Conversational Agents in a Dual-Control Environment. \emph{arXiv:2506.07982}.
+
+\bibitem[Anonymous(2025a)]{anon2025errortax} Anonymous. (2025). Where LLM Agents Fail and How They Can Learn From Failures. \emph{arXiv:2509.25370}.
+
+\bibitem[Anonymous(2025b)]{anon2025measurement} Anonymous. (2025). The Measurement Imbalance in Agentic AI Evaluation. \emph{arXiv:2506.02064}.
+
+\bibitem[Anonymous(2026)]{anon2026mirage} Anonymous. (2026). The Long-Horizon Task Mirage: Diagnosing Where and Why Agentic Systems Break. \emph{arXiv:2604.11978}.
+
+\end{thebibliography}
+
+\appendix
+\section{Reproducibility}
+All results in this paper are produced by \texttt{simulation.py} (Monte Carlo experiments A--F, fixed base random seed 20260726, $N=20{,}000$ trials per configuration unless otherwise noted) and \texttt{make\_figures.py} (figure generation). Both scripts, along with the raw \texttt{results.json} output, are provided in the accompanying repository.
+
+\section{Full Numeric Results}
+Selected results from Experiment A (compounding error and recovery vs.\ horizon, $p=0.97$) are shown in Table~\ref{tab:expa}; the full table, plus Experiments B, E, and F, are provided in \texttt{results.json} in the code repository.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{rrrrr}
+\toprule
+$n$ & $P(\text{success})$ baseline & $P(\text{success})$ checkpoint & Cost baseline & Cost checkpoint \\
+\midrule
+1   & 0.971 & 0.992 & 1.0   & 1.1 \\
+10  & 0.735 & 0.901 & 10.0  & 12.9 \\
+50  & 0.219 & 0.584 & 50.0  & 52.1 \\
+100 & 0.048 & 0.334 & 100.0 & 82.8 \\
+150 & 0.011 & 0.197 & 150.0 & 100.2 \\
+300 & 0.000 & 0.039 & 300.0 & 120.3 \\
+\bottomrule
+\end{tabular}
+\caption{Selected rows of Experiment A (full table in \texttt{results.json}).}
+\label{tab:expa}
+\end{table}
+
+\end{document}
